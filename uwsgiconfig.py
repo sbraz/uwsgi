@@ -12,13 +12,8 @@ uwsgi_cpu = os.uname()[4]
 
 import sys
 import subprocess
-from threading import Thread,Lock
+from multiprocessing import Process, Lock, Queue
 from optparse import OptionParser
-
-try:
-    from queue import Queue
-except:
-    from Queue import Queue
 
 from distutils import sysconfig
 
@@ -271,7 +266,7 @@ def build_uwsgi(uc, print_only=False, gcll=None):
         print_lock = Lock()
         compile_queue = Queue(maxsize=CPUCOUNT)
         for i in range(0,CPUCOUNT):
-            t = Thread(target=thread_compiler,args=(i,))
+            t = Process(target=thread_compiler,args=(i,))
             t.daemon = True
             t.start()
             thread_compilers.append(t)
